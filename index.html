@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>word-qazar</title>
@@ -7,37 +7,12 @@
 <body>
   <h1>enter word</h1>
   <input id="word" placeholder="libro" />
-  <input id="meaning" placeholder="Buch" />
-  <button onclick="addWord()">add</button>
+  <input id="meaning" placeholder="book" />
+  <button id="addBtn">add</button>
 
   <h2>saved words</h2>
   <ul id="list"></ul>
 
-  <script>
-    async function addWord() {
-      const word = document.getElementById('word').value;
-      const meaning = document.getElementById('meaning').value;
-      await fetch('/api/words', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ word, meaning })
-      });
-      loadWords();
-    }
-
-    async function loadWords() {
-      const res = await fetch('/api/words');
-      const data = await res.json();
-      const list = document.getElementById('list');
-      list.innerHTML = '';
-      data.forEach(v => {
-        const li = document.createElement('li');
-        li.textContent = `${v.word} → ${v.meaning}`;
-        list.appendChild(li);
-      });
-    }
-
-    loadWords();
-  </script>
+  <script src="/main.js"></script>
 </body>
 </html>
