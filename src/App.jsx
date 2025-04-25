@@ -27,6 +27,15 @@ export default function App() {
     setTranslation('');
   };
 
+  const handleDelete = async (id) => {
+    const res = await fetch(`/api/words?id=${id}`, {
+      method: 'DELETE',
+    });
+    if (res.ok) {
+      setPhrases((prev) => prev.filter((entry) => entry.id !== id));
+    }
+  };
+
   return (
     <div className="max-w-md mx-auto p-4 text-sm">
       <h1 className="text-2xl font-bold text-center mb-4">Word-Qazar</h1>
@@ -72,10 +81,17 @@ export default function App() {
       </button>
 
       <div className="space-y-2">
-        {phrases.map((entry, i) => (
-          <div key={i} className="border p-3 rounded shadow-sm bg-gray-50">
-            <div className="font-bold">{entry.word}</div>
-            <div>{entry.meaning}</div>
+        {phrases.map((p) => (
+          <div key={p.id} className="relative border p-3 rounded shadow-sm bg-gray-50">
+            <button
+              onClick={() => handleDelete(p.id)}
+              className="absolute top-4 right-4 text-2xl hover:cursor-pointer"
+              aria-label="Delete phrase"
+            >
+              🗑️
+            </button>
+            <div className="font-bold">{p.word}</div>
+            <div>{p.meaning}</div>
           </div>
         ))}
       </div>

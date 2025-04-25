@@ -32,5 +32,13 @@ export default async function handler(req, res) {
     return res.status(201).json(data);
   }
 
+  if (req.method === 'DELETE') {
+    const id = req.query.id;
+    if (!id) return res.status(400).json({ error: 'ID missing' });
+    const { error } = await supabase.from('words').delete().eq('id', id);
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(204).end();
+  }
+
   res.status(405).end(); // Method not allowed
 }
