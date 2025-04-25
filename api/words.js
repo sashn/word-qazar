@@ -27,7 +27,7 @@ export default async function handler(req, res) {
 
   if (req.method === 'POST') {
     const { word, meaning } = req.body;
-    const { data, error } = await supabase.from('words').insert([{ word, meaning }]);
+    const { data, error } = await supabase.from('words').insert([{ word, meaning }]).select();
     if (error) return res.status(500).json({ error: error.message });
     return res.status(201).json(data);
   }
