@@ -1,56 +1,84 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 
-function App() {
-  const [words, setWords] = useState([]);
-  const [word, setWord] = useState('');
-  const [meaning, setMeaning] = useState('');
+export default function App() {
+  const [language, setLanguage] = useState('de');
+  const [phrase, setPhrase] = useState('');
+  const [translation, setTranslation] = useState('');
+  const [phrases, setPhrases] = useState([]);
 
   useEffect(() => {
-    loadWords();
+    fetch('/api/words')
+      .then((res) => res.json())
+      .then(setPhrases)
+      .catch(console.error);
   }, []);
 
-  async function loadWords() {
-    const res = await fetch('/api/words');
-    const data = await res.json();
-    setWords(data);
-  }
-
-  async function addWord() {
-    await fetch('/api/words', {
+  const handleSubmit = async () => {
+    if (!phrase || !translation) return;
+    const newEntry = { word: phrase, meaning: translation };
+    const res = await fetch('/api/words', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ word, meaning })
+      body: JSON.stringify(newEntry),
     });
-    setWord('');
-    setMeaning('');
-    loadWords();
-  }
+    const data = await res.json();
+    setPhrases((prev) => [...prev, ...data]);
+    setPhrase('');
+    setTranslation('');
+  };
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h1>Enter word</h1>
-      <input
-        placeholder="libro"
-        value={word}
-        onChange={(e) => setWord(e.target.value)}
-      />
-      <input
-        placeholder="book"
-        value={meaning}
-        onChange={(e) => setMeaning(e.target.value)}
-      />
-      <button onClick={addWord}>Add</button>
+    <div className="max-w-md mx-auto p-4 text-sm">
+      <h1 className="text-2xl font-bold text-center mb-4">Word-Qazar</h1>
 
-      <h2>Saved words</h2>
-      <ul>
-        {words.map((w) => (
-          <li key={w.id}>
-            {w.word} → {w.meaning}
-          </li>
+      <div className="mb-4">
+        <label className="block text-gray-700 mb-1">Sprache</label>
+        <select
+          value={language}
+          onChange={(e) => setLanguage(e.target.value)}
+          className="w-full border rounded px-2 py-1"
+        >
+          <option value="de">🇩🇪 Deutsch</option>
+          <option value="en">🇺🇸 Englisch</option>
+          <option value="fr">🇫🇷 Französisch</option>
+        </select>
+      </div>
+
+      <div className="mb-2">
+        <textarea
+          rows="2"
+          placeholder="Phrase"
+          value={phrase}
+          onChange={(e) => setPhrase(e.target.value)}
+          className="w-full border rounded px-2 py-1 resize-none"
+        />
+      </div>
+
+      <div className="mb-2">
+        <textarea
+          rows="2"
+          placeholder="Übersetzung"
+          value={translation}
+          onChange={(e) => setTranslation(e.target.value)}
+          className="w-full border rounded px-2 py-1 resize-none"
+        />
+      </div>
+
+      <button
+        onClick={handleSubmit}
+        className="w-full bg-black text-white py-2 rounded mb-6"
+      >
+        Speichern
+      </button>
+
+      <div className="space-y-2">
+        {phrases.map((entry, i) => (
+          <div key={i} className="border p-3 rounded shadow-sm bg-gray-50">
+            <div className="font-bold">{entry.word}</div>
+            <div>{entry.meaning}</div>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
-
-export default App;
